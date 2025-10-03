@@ -1,0 +1,4 @@
+dist/
+vibesort_mcp.egg-info/
+__pycache__/
+*.pyc
