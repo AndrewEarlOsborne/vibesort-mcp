@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-from openai import OpenAI
+from openai import OpenAI, AuthenticationError
 from pydantic import BaseModel, Field
 from typing import Any
 from argparse import ArgumentParser
@@ -28,13 +28,22 @@ def main():
 
     openai_api_key = args.openai_api_key
 
-    logger.info("VibeSort MCP Server: Initializing Server...")
 
-    vibe_sort_mcp = FastMCP(name="VibeSort MCP")
+    try:
+        client = OpenAI(api_key=openai_api_key)
+        _result = client.models.list()
+        
+        logger.info("VibeSort MCP Server: Initializing Server...")
 
-    logger.info("VibeSort MCP Server: Starting...")
-    vibe_sort_mcp.run()
-    logger.info("VibeSort MCP Server: Running")
+        vibe_sort_mcp = FastMCP(name="VibeSort MCP")
+
+        logger.info("VibeSort MCP Server: Starting...")
+        vibe_sort_mcp.run()
+        logger.info("VibeSort MCP Server: Running")
+    except AuthenticationError as e:
+        logger.error("Invalid OpenAI API key.")
+        raise e
+    
 
     @vibe_sort_mcp.tool()
     def sort(self, VibeSortInput) -> list[Any]:
